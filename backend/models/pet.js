@@ -18,7 +18,7 @@ class Pet {
   static async create(data) {
     const result = await db.query(
       `INSERT INTO pets (name,
-                             species,
+                        species,
                              age,
                              gender,
                              color,
@@ -32,8 +32,7 @@ class Pet {
         data.age,
         data.gender,
         data.color,
-        data,
-        description,
+        data.description,
         data.photos,
       ]
     );
@@ -54,11 +53,11 @@ class Pet {
    * */
 
   static async findAll({ species, color, age, gender } = {}) {
-    let query = `SELECT j.id,
-                        j.species,
-                        j.color,
-                        j.age,
-                        j.gender"
+    let query = `SELECT p.pet_id,
+                        p.species,
+                        p.color,
+                        p.age,
+                        p.gender
                  FROM pets p`;
     let whereExpressions = [];
     let queryValues = [];

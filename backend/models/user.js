@@ -26,10 +26,7 @@ class User {
     const result = await db.query(
       `SELECT username,
                   password,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
+                  email
            FROM users
            WHERE username = $1`,
       [username]
@@ -56,14 +53,7 @@ class User {
    * Throws BadRequestError on duplicates.
    **/
 
-  static async register({
-    username,
-    password,
-    firstName,
-    lastName,
-    email,
-    isAdmin,
-  }) {
+  static async register({ username, password, email }) {
     const duplicateCheck = await db.query(
       `SELECT username
            FROM users
@@ -83,7 +73,7 @@ class User {
             password,
             email)
            VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING username, first_name AS "firstName", last_name AS "lastName", email, is_admin AS "isAdmin"`,
+           RETURNING username, email `,
       [username, hashedPassword, email]
     );
 
@@ -152,7 +142,7 @@ class User {
    *
    * Throws NotFoundError if not found.
    *
-   * WARNING: this function can set a new password or make a user an admin.
+   * WARNING: this function can set a new password.
    * Callers of this function must be certain they have validated inputs to this
    * or a serious security risks are opened.
    */

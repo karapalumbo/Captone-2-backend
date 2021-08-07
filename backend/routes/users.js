@@ -5,7 +5,7 @@
 const jsonschema = require("jsonschema");
 
 const express = require("express");
-const { ensureCorrectUserOrAdmin } = require("../middleware/auth");
+const { ensureCorrectUser } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
@@ -16,14 +16,12 @@ const router = express.Router();
 
 /** POST / { user }  => { user, token }
  *
- * Adds a new user. This is not the registration endpoint --- instead, this is
- * only for admin users to add new users. The new user being added can be an
- * admin.
+ * Adds a new user.
  *
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, email }, token }
  *
- * Authorization required: admin
+ * Authorization required: none
  **/
 
 router.post("/", async function (req, res, next) {
@@ -46,7 +44,7 @@ router.post("/", async function (req, res, next) {
  *
  * Returns list of all users.
  *
- * Authorization required: admin
+ * Authorization required: none
  **/
 
 router.get("/", async function (req, res, next) {
@@ -63,21 +61,17 @@ router.get("/", async function (req, res, next) {
  * Returns { username, pets }
  *   where pets is { id, title, companyHandle, companyName, state } ******
  *
- * Authorization required: admin or same user-as-:username
+ * Authorization required: same user-as-:username
  **/
 
-router.get(
-  "/:username",
-  ensureCorrectUserOrAdmin,
-  async function (req, res, next) {
-    try {
-      const user = await User.get(req.params.username);
-      return res.json({ user });
-    } catch (err) {
-      return next(err);
-    }
+router.get("/:username", ensureCorrectUser, async function (req, res, next) {
+  try {
+    const user = await User.get(req.params.username);
+    return res.json({ user });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
 /** PATCH /[username] { user } => { user }
  *
@@ -89,42 +83,34 @@ router.get(
  * Authorization required: same-user-as-:username
  **/
 
-router.patch(
-  "/:username",
-  ensureCorrectUserOrAdmin,
-  async function (req, res, next) {
-    try {
-      const validator = jsonschema.validate(req.body, userUpdateSchema);
-      if (!validator.valid) {
-        const errs = validator.errors.map((e) => e.stack);
-        throw new BadRequestError(errs);
-      }
-
-      const user = await User.update(req.params.username, req.body);
-      return res.json({ user });
-    } catch (err) {
-      return next(err);
+router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
+  try {
+    const validator = jsonschema.validate(req.body, userUpdateSchema);
+    if (!validator.valid) {
+      const errs = validator.errors.map((e) => e.stack);
+      throw new BadRequestError(errs);
     }
+
+    const user = await User.update(req.params.username, req.body);
+    return res.json({ user });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
 /** DELETE /[username]  =>  { deleted: username }
  *
  * Authorization required: same-user-as-:username
  **/
 
-router.delete(
-  "/:username",
-  ensureCorrectUserOrAdmin,
-  async function (req, res, next) {
-    try {
-      await User.remove(req.params.username);
-      return res.json({ deleted: req.params.username });
-    } catch (err) {
-      return next(err);
-    }
+router.delete("/:username", ensureCorrectUser, async function (req, res, next) {
+  try {
+    await User.remove(req.params.username);
+    return res.json({ deleted: req.params.username });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
 /** POST /[username]/pets/[id]  { state } => { favorites }
  *
@@ -135,7 +121,7 @@ router.delete(
 
 router.post(
   "/:username/pets/:id",
-  ensureCorrectUserOrAdmin,
+  ensureCorrectUser,
   async function (req, res, next) {
     try {
       const petId = +req.params.id;

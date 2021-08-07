@@ -27,10 +27,7 @@ describe("authenticate", function () {
     const user = await User.authenticate("u1", "password1");
     expect(user).toEqual({
       username: "u1",
-      firstName: "U1F",
-      lastName: "U1L",
       email: "u1@email.com",
-      isAdmin: false,
     });
   });
 
@@ -58,10 +55,7 @@ describe("authenticate", function () {
 describe("register", function () {
   const newUser = {
     username: "new",
-    firstName: "Test",
-    lastName: "Tester",
     email: "test@test.com",
-    isAdmin: false,
   };
 
   test("works", async function () {
@@ -216,8 +210,7 @@ describe("update", function () {
 describe("remove", function () {
   test("works", async function () {
     await User.remove("u1");
-    const res = await db.query(
-        "SELECT * FROM users WHERE username='u1'");
+    const res = await db.query("SELECT * FROM users WHERE username='u1'");
     expect(res.rows.length).toEqual(0);
   });
 
@@ -237,12 +230,15 @@ describe("applyToJob", function () {
   test("works", async function () {
     await User.applyToJob("u1", testJobIds[1]);
 
-    const res = await db.query(
-        "SELECT * FROM applications WHERE job_id=$1", [testJobIds[1]]);
-    expect(res.rows).toEqual([{
-      job_id: testJobIds[1],
-      username: "u1",
-    }]);
+    const res = await db.query("SELECT * FROM applications WHERE job_id=$1", [
+      testJobIds[1],
+    ]);
+    expect(res.rows).toEqual([
+      {
+        job_id: testJobIds[1],
+        username: "u1",
+      },
+    ]);
   });
 
   test("not found if no such job", async function () {

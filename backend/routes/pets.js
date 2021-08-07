@@ -58,7 +58,7 @@ router.get("/:id", async function (req, res, next) {
 
 /** DELETE /[handle]  =>  { deleted: id }
  *
- * Authorization required: admin
+ * Authorization required: none
  */
 
 router.delete("/:id", async function (req, res, next) {

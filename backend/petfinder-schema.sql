@@ -2,19 +2,17 @@ CREATE TABLE users (
   username VARCHAR(25) PRIMARY KEY,
   password TEXT NOT NULL,
   email TEXT NOT NULL
-    CHECK (position('@' IN email) > 1)
 );
 
 CREATE TABLE pets (
-  id SERIAL PRIMARY KEY,
-  pet_id INTEGER NOT NULL,
+  pet_id INTEGER NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   species TEXT NOT NULL,
-  age INTEGER,
-  gender INTEGER NOT NULL,
+  age TEXT NOT NULL,
+  gender TEXT NOT NULL,
   color TEXT,
-  description TEXT NOT NULL,
-  photos TEXT,
+  description TEXT,
+  photos TEXT
 );
 
 CREATE TABLE favorites (

@@ -12,8 +12,8 @@
       "minLength": 1
     },
     "age": {
-      "type": "integer",
-      "minimum": 0
+      "type": "string",
+      "minLength": 1
     },
     "gender": {
       "type": "string",
