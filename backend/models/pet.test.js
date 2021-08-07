@@ -2,13 +2,13 @@
 
 const { NotFoundError, BadRequestError } = require("../expressError");
 const db = require("../db.js");
-const Job = require("./job.js");
+const Pet = require("./pet.js");
 const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
+  testPetIds,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -214,8 +214,9 @@ describe("update", function () {
 describe("remove", function () {
   test("works", async function () {
     await Job.remove(testJobIds[0]);
-    const res = await db.query(
-        "SELECT id FROM jobs WHERE id=$1", [testJobIds[0]]);
+    const res = await db.query("SELECT id FROM jobs WHERE id=$1", [
+      testJobIds[0],
+    ]);
     expect(res.rows.length).toEqual(0);
   });
 

@@ -1,17 +1,21 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://our.company.com/companySearch.schema.json",
+  "$id": "http://our.favorites.com/petSearch.schema.json",
   "type": "object",
   "properties": {
-    "minEmployees": {
+    "species": {
+      "type": "string",
+      "minLength": 1
+    },
+    "color": {
+      "type": "string",
+      "minLength": 1
+    },
+    "age": {
       "type": "integer",
       "minimum": 0
     },
-    "maxEmployees": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "name": {
+    "gender": {
       "type": "string",
       "minLength": 1
     }
