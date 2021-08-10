@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 
 const express = require("express");
 const { BadRequestError } = require("../expressError");
-const pet = require("../models/pet");
+const Pet = require("../models/pet");
 const petSearchSchema = require("../schemas/petSearch.json");
 
 const router = express.Router({ mergeParams: true });
@@ -33,7 +33,7 @@ router.get("/", async function (req, res, next) {
       throw new BadRequestError(errs);
     }
 
-    const pets = await pet.findAll(q);
+    const pets = await Pet.findAll(q);
     return res.json({ pets });
   } catch (err) {
     return next(err);
@@ -49,7 +49,7 @@ router.get("/", async function (req, res, next) {
 
 router.get("/:id", async function (req, res, next) {
   try {
-    const pet = await pet.get(req.params.id);
+    const pet = await Pet.get(req.params.id);
     return res.json({ pet });
   } catch (err) {
     return next(err);
@@ -63,7 +63,7 @@ router.get("/:id", async function (req, res, next) {
 
 router.delete("/:id", async function (req, res, next) {
   try {
-    await pet.remove(req.params.id);
+    await Pet.remove(req.params.id);
     return res.json({ deleted: +req.params.id });
   } catch (err) {
     return next(err);

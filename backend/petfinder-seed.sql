@@ -1,7 +1,9 @@
-INSERT INTO users (username, password, email)
+INSERT INTO users (username, password, first_name, last_name, email)
 VALUES ('testuser',
         '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q',
-        'joel@joelburton.com');
+        'Test',
+        'User',
+        'test@testuser.com');
 
 
 INSERT INTO pets (pet_id, name, species, age, gender, color, description, photos)

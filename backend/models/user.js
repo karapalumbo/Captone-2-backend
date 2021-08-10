@@ -25,8 +25,10 @@ class User {
     // try to find the user first
     const result = await db.query(
       `SELECT username,
-                  password,
-                  email
+                  password, 
+                  first_name AS "firstName, 
+                  last_name AS "lastName",
+                  email,
            FROM users
            WHERE username = $1`,
       [username]
@@ -53,11 +55,11 @@ class User {
    * Throws BadRequestError on duplicates.
    **/
 
-  static async register({ username, password, email }) {
+  static async register({ username, password, firstName, lastName, email }) {
     const duplicateCheck = await db.query(
       `SELECT username
-           FROM users
-           WHERE username = $1`,
+        FROM users
+        WHERE username = $1`,
       [username]
     );
 
@@ -71,10 +73,12 @@ class User {
       `INSERT INTO users
            (username,
             password,
+            first_name, 
+            last_name,
             email)
-           VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING username, email `,
-      [username, hashedPassword, email]
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING username, first_name AS "firstName", last_name AS "lastName", email`,
+      [username, hashedPassword, firstName, lastName, email]
     );
 
     const user = result.rows[0];
@@ -90,7 +94,9 @@ class User {
   static async findAll() {
     const result = await db.query(
       `SELECT username,
-                  email
+              first_name AS "firstName",
+              last_name AS "lastName",
+              email
            FROM users
            ORDER BY username`
     );
@@ -109,7 +115,9 @@ class User {
   static async get(username) {
     const userRes = await db.query(
       `SELECT username,
-                  email,
+              first_name AS "firstName",
+              last_name AS "lastName",
+              email
            FROM users
            WHERE username = $1`,
       [username]
@@ -120,13 +128,13 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
     const userFavoritesRes = await db.query(
-      `SELECT a.pet_id
-           FROM favorites AS a
-           WHERE a.username = $1`,
+      `SELECT f.pet_id
+           FROM favorites AS f
+           WHERE f.username = $1`,
       [username]
     );
 
-    user.favorites = userFavoritesRes.rows.map((a) => a.pet_id);
+    user.favorites = userFavoritesRes.rows.map((a) => f.pet_id);
     return user;
   }
 
@@ -136,16 +144,41 @@ class User {
    * all the fields; this only changes provided ones.
    *
    * Data can include:
-   *   { email, password }
+   *   { firstName, lastName, email, password }
    *
-   * Returns { username, email  }
+   * Returns { username, firstName, lastName, email  }
    *
    * Throws NotFoundError if not found.
    *
-   * WARNING: this function can set a new password.
-   * Callers of this function must be certain they have validated inputs to this
-   * or a serious security risks are opened.
    */
+
+  static async update(username, data) {
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
+    }
+
+    const { setCols, values } = sqlForPartialUpdate(data, {
+      firstName: "first_name",
+      lastName: "last_name",
+    });
+    const usernameVarIdx = "$" + (values.length + 1);
+
+    const querySql = `UPDATE users 
+                      SET ${setCols}
+                      WHERE username = ${usernameVarIdx}
+                      RETURNING username, 
+                                first_name AS "firstName",
+                                last_name AS "lastName", 
+                                email`;
+
+    const result = await db.query(querySql, [...values, username]);
+    const user = result.rows[0];
+
+    if (!user) throw new NotFoundError(`No user: ${username}`);
+
+    delete user.password;
+    return user;
+  }
 
   /** Delete given user from database; returns undefined. */
 
@@ -190,9 +223,9 @@ class User {
     if (!user) throw new NotFoundError(`No username: ${username}`);
 
     await db.query(
-      `INSERT INTO favorites (pet_id, username)
+      `INSERT INTO favorites (username, pet_id)
            VALUES ($1, $2)`,
-      [petId, username]
+      [username, petId]
     );
   }
 }
