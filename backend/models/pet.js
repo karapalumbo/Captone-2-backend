@@ -10,41 +10,6 @@ const { sqlForPartialUpdate } = require("../helpers/sql");
 /** Related functions for companies. */
 
 class Pet {
-  /** Create a pet (from data), update db, return new pet data.
-   *
-   * data should be { name, species, age, gender, color, description, photos }
-   *
-   * Returns { id, name, species, age, gender, color, description, photos }
-   **/
-
-  // static async create(data) {
-  //   const result = await db.query(
-  //     `INSERT INTO pets (pet_id,
-  //                       name,
-  //                       species,
-  //                       age,
-  //                       gender,
-  //                       color,
-  //                       description,
-  //                       photos)
-  //          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-  //          RETURNING id, pet_id, name, species, age, gender, color, description, photos`,
-  //     [
-  //       data.pet_id,
-  //       data.name,
-  //       data.species,
-  //       data.age,
-  //       data.gender,
-  //       data.color,
-  //       data.description,
-  //       data.photos,
-  //     ]
-  //   );
-  //   let pet = result.rows[0];
-
-  //   return pet;
-  // }
-
   /** Find all pets (optional filter on searchFilters).
    *
    * searchFilters (all optional):
@@ -57,7 +22,8 @@ class Pet {
    * */
 
   static async findAll(searchFilters = {}) {
-    let query = `SELECT name,
+    let query = `SELECT pet_id,
+                        name,
                         species,
                         color,
                         age,

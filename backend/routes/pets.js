@@ -12,7 +12,7 @@ const petSearchSchema = require("../schemas/petSearch.json");
 const router = express.Router({ mergeParams: true });
 
 /** GET / =>
- *   { pets: [ { id, name, species, age, gender, color, description, photos }, ...] }
+ *   { pets: [ { pet_id, name, species, age, gender, color, description, photos }, ...] }
  *
  * Can provide search filter in query:
  * - species
@@ -42,29 +42,15 @@ router.get("/", async function (req, res, next) {
 
 /** GET /[petId] => { pet }
  *
- * Returns { id, name, species, age, gender, color, description, photos }
+ * Returns { pet_id, name, species, age, gender, color, description, photos }
  *
  * Authorization required: none
  */
 
-router.get("/:id", async function (req, res, next) {
+router.get("/:pet_id", async function (req, res, next) {
   try {
-    const pet = await Pet.get(req.params.id);
+    const pet = await Pet.get(req.params.pet_id);
     return res.json({ pet });
-  } catch (err) {
-    return next(err);
-  }
-});
-
-/** DELETE /[handle]  =>  { deleted: id }
- *
- * Authorization required: none
- */
-
-router.delete("/:id", async function (req, res, next) {
-  try {
-    await Pet.remove(req.params.id);
-    return res.json({ deleted: +req.params.id });
   } catch (err) {
     return next(err);
   }
