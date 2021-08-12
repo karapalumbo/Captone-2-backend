@@ -25,10 +25,7 @@ class User {
     // try to find the user first
     const result = await db.query(
       `SELECT username,
-                  password, 
-                  first_name AS "firstName, 
-                  last_name AS "lastName",
-                  email,
+              password
            FROM users
            WHERE username = $1`,
       [username]
@@ -128,13 +125,13 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
     const userFavoritesRes = await db.query(
-      `SELECT f.pet_id
-           FROM favorites AS f
-           WHERE f.username = $1`,
+      `SELECT pet_id, username
+           FROM favorites
+           WHERE username = $1`,
       [username]
     );
 
-    user.favorites = userFavoritesRes.rows.map((a) => f.pet_id);
+    user.favorites = userFavoritesRes.rows.map((f) => f.pet_id);
     return user;
   }
 
@@ -203,9 +200,9 @@ class User {
 
   static async favoritePet(username, petId) {
     const preCheck = await db.query(
-      `SELECT id
+      `SELECT pet_id
            FROM pets
-           WHERE id = $1`,
+           WHERE pet_id = $1`,
       [petId]
     );
     const pet = preCheck.rows[0];

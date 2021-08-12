@@ -1,11 +1,7 @@
 "use strict";
 
-const { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } = require("constants");
-const { deserialize } = require("v8");
-const { search } = require("../app");
 const db = require("../db");
 const { NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
 
 /** Related functions for companies. */
 

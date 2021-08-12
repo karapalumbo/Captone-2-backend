@@ -120,11 +120,12 @@ router.delete("/:username", ensureCorrectUser, async function (req, res, next) {
  * */
 
 router.post(
-  "/:username/pets/:id",
+  "/:username/pets/:pet_id",
   ensureCorrectUser,
   async function (req, res, next) {
     try {
-      const petId = +req.params.id;
+      const petIdString = +req.params.pet_id;
+      const petId = parseInt(petIdString);
       await User.favoritePet(req.params.username, petId);
       return res.json({ favorited: petId });
     } catch (err) {
