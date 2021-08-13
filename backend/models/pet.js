@@ -30,10 +30,15 @@ class Pet {
     let whereExpressions = [];
     let queryValues = [];
 
-    const { species, color, age, gender } = searchFilters;
+    const { name, species, color, age, gender } = searchFilters;
 
     // For each possible search term, add to whereExpressions and
     // queryValues so we can generate the right SQL
+
+    if (name !== undefined) {
+      queryValues.push(`%${name}%`);
+      whereExpressions.push(`name ILIKE $${queryValues.length}`);
+    }
 
     if (species !== undefined) {
       queryValues.push(`%${species}%`);
