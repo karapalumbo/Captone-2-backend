@@ -18,9 +18,9 @@ CREATE TABLE pets (
 );
 
 CREATE TABLE favorites (
+  id SERIAL PRIMARY KEY,
   username VARCHAR(25)
     REFERENCES users ON DELETE CASCADE,
   pet_id INTEGER
-    REFERENCES pets ON DELETE CASCADE,
-  PRIMARY KEY (username, pet_id)
+    REFERENCES pets ON DELETE CASCADE
 );

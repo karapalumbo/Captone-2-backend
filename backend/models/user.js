@@ -225,6 +225,14 @@ class User {
       [username, petId]
     );
   }
+
+  static async unfavoritePet(petId) {
+    await db.query(
+      `DELETE FROM favorites
+            WHERE pet_id = $1`,
+      [petId]
+    );
+  }
 }
 
 module.exports = User;
