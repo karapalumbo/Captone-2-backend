@@ -18,7 +18,7 @@ class Pet {
    * */
 
   static async findAll(searchFilters = {}) {
-    let query = `SELECT pet_id,
+    let query = `SELECT pet_id AS petId,
                         name,
                         species,
                         color,
