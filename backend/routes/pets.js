@@ -16,6 +16,7 @@ const router = express.Router({ mergeParams: true });
  *
  * Can provide search filter in query:
  * - species
+ * - name
  * - color
  * - age
  * - gender

@@ -17,7 +17,7 @@ class Pet {
    * Returns [{ id, name, species, age, gender, color, description, photos }, ...]
    * */
 
-  static async findAll(searchFilters = {}) {
+  static async findAll(searchQuery) {
     let query = `SELECT pet_id,
                         name,
                         species,
@@ -30,7 +30,7 @@ class Pet {
     let whereExpressions = [];
     let queryValues = [];
 
-    const { name, species, color, age, gender } = searchFilters;
+    const { species, color, age, gender, name } = searchQuery;
 
     // For each possible search term, add to whereExpressions and
     // queryValues so we can generate the right SQL
@@ -38,36 +38,23 @@ class Pet {
     if (name !== undefined) {
       queryValues.push(`%${name}%`);
       whereExpressions.push(`name ILIKE $${queryValues.length}`);
-    }
-
-    if (species !== undefined) {
-      queryValues.push(`%${species}%`);
+      queryValues.push(`%${name}%`);
+      whereExpressions.push(`color ILIKE $${queryValues.length}`);
+      queryValues.push(`%${name}%`);
+      whereExpressions.push(`gender ILIKE $${queryValues.length}`);
+      queryValues.push(`%${name}%`);
       whereExpressions.push(`species ILIKE $${queryValues.length}`);
     }
 
-    if (color !== undefined) {
-      queryValues.push(`%${color}%`);
-      whereExpressions.push(`color ILIKE $${queryValues.length}`);
-    }
-
-    if (age !== undefined) {
-      queryValues.push(`%${age}%`);
-      whereExpressions.push(`age ILIKE $${queryValues.length}`);
-    }
-
-    if (gender !== undefined) {
-      queryValues.push(`%${gender}%`);
-      whereExpressions.push(`gender ILIKE $${queryValues.length}`);
-    }
-
     if (whereExpressions.length > 0) {
-      query += " WHERE " + whereExpressions.join(" AND ");
+      query += " WHERE " + whereExpressions.join(" OR ");
     }
 
     // Finalize query and return results
 
     query += " ORDER BY name";
     const petsRes = await db.query(query, queryValues);
+
     return petsRes.rows;
   }
 

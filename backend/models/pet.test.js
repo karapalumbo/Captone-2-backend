@@ -16,25 +16,6 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-/************************************** create */
-
-describe("create", function () {
-  let newJob = {
-    companyHandle: "c1",
-    title: "Test",
-    salary: 100,
-    equity: "0.1",
-  };
-
-  test("works", async function () {
-    let job = await Job.create(newJob);
-    expect(job).toEqual({
-      ...newJob,
-      id: expect.any(Number),
-    });
-  });
-});
-
 /************************************** findAll */
 
 describe("findAll", function () {
