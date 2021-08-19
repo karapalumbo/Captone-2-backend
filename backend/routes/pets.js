@@ -15,11 +15,9 @@ const router = express.Router({ mergeParams: true });
  *   { pets: [ { pet_id, name, species, age, gender, color, description, photos }, ...] }
  *
  * Can provide search filter in query:
- * - species
  * - name
  * - color
  * - age
- * - gender
 
  * Authorization required: none
  */

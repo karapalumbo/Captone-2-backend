@@ -9,10 +9,9 @@ class Pet {
   /** Find all pets (optional filter on searchFilters).
    *
    * searchFilters (all optional):
-   * - species
+   * - name
    * - color
    * - age
-   * - gender
    *
    * Returns [{ id, name, species, age, gender, color, description, photos }, ...]
    * */
@@ -30,7 +29,7 @@ class Pet {
     let whereExpressions = [];
     let queryValues = [];
 
-    const { species, color, age, gender, name } = searchQuery;
+    const { name } = searchQuery;
 
     // For each possible search term, add to whereExpressions and
     // queryValues so we can generate the right SQL
@@ -41,9 +40,7 @@ class Pet {
       queryValues.push(`%${name}%`);
       whereExpressions.push(`color ILIKE $${queryValues.length}`);
       queryValues.push(`%${name}%`);
-      whereExpressions.push(`gender ILIKE $${queryValues.length}`);
-      queryValues.push(`%${name}%`);
-      whereExpressions.push(`species ILIKE $${queryValues.length}`);
+      whereExpressions.push(`age ILIKE $${queryValues.length}`);
     }
 
     if (whereExpressions.length > 0) {
