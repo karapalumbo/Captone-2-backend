@@ -24,7 +24,8 @@ class Pet {
                         age,
                         gender,
                         description, 
-                        photos
+                        photos,
+                        id AS organization_id
                  FROM pets`;
     let whereExpressions = [];
     let queryValues = [];
@@ -71,7 +72,8 @@ class Pet {
               gender, 
               color, 
               description, 
-              photos 
+              photos, 
+              id AS organization_id
         FROM pets
         WHERE pet_id = $1`,
       [pet_id]
@@ -82,6 +84,25 @@ class Pet {
     if (!pet) throw new NotFoundError(`No pet: ${pet_id}`);
 
     return pet;
+  }
+
+  static async getOrganization(organization_id) {
+    const orgRes = await db.query(
+      `SELECT id,
+            name,
+            address,
+            email,
+            phone
+         FROM organizations
+         WHERE id = $1`,
+      [organization_id]
+    );
+
+    const org = orgRes.rows[0];
+
+    if (!org) throw new NotFoundError(`No organization: ${org_id}`);
+
+    return org;
   }
 }
 

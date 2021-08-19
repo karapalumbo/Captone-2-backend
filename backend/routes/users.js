@@ -11,7 +11,6 @@ const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
-const Pet = require("../models/pet");
 
 const router = express.Router();
 
@@ -143,7 +142,6 @@ router.delete(
       const petIdString = +req.params.pet_id;
       const petId = parseInt(petIdString);
       await User.unfavoritePet(petId);
-      // return res.json({ unfavorited: petId });
     } catch (err) {
       return next(err);
     }

@@ -6,6 +6,15 @@ CREATE TABLE users (
   email TEXT NOT NULL
 );
 
+CREATE TABLE organizations (
+  id SERIAL PRIMARY KEY,
+  org_id TEXT NOT NULL, 
+  name TEXT, 
+  address TEXT, 
+  email TEXT, 
+  phone TEXT
+);
+
 CREATE TABLE pets (
   pet_id INTEGER NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
@@ -14,7 +23,9 @@ CREATE TABLE pets (
   gender TEXT NOT NULL,
   color TEXT,
   description TEXT,
-  photos TEXT
+  photos TEXT,
+  id INTEGER
+    REFERENCES organizations ON DELETE CASCADE
 );
 
 CREATE TABLE favorites (
@@ -24,3 +35,5 @@ CREATE TABLE favorites (
   pet_id INTEGER
     REFERENCES pets ON DELETE CASCADE
 );
+
+
