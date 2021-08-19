@@ -18,105 +18,92 @@ afterAll(commonAfterAll);
 
 /************************************** findAll */
 
+// pet_id, name, species, age, description, gender, color, photos;
+
 describe("findAll", function () {
   test("works: no filter", async function () {
-    let jobs = await Job.findAll();
-    expect(jobs).toEqual([
+    let pets = await Pet.findAll();
+    expect(pets).toEqual([
       {
-        id: testJobIds[0],
-        title: "Job1",
-        salary: 100,
-        equity: "0.1",
-        companyHandle: "c1",
-        companyName: "C1",
+        pet_id: testPetIds[0],
+        name: "P1",
+        species: "PS1",
+        age: "PA1",
+        description: "PD1",
+        gender: "PG1",
+        color: "PC1",
       },
       {
-        id: testJobIds[1],
-        title: "Job2",
-        salary: 200,
-        equity: "0.2",
-        companyHandle: "c1",
-        companyName: "C1",
+        pet_id: testPetIds[1],
+        name: "P2",
+        species: "PS2",
+        age: "PA2",
+        description: "PD2",
+        gender: "PG2",
+        color: "PC1",
       },
       {
-        id: testJobIds[2],
-        title: "Job3",
-        salary: 300,
-        equity: "0",
-        companyHandle: "c1",
-        companyName: "C1",
-      },
-      {
-        id: testJobIds[3],
-        title: "Job4",
-        salary: null,
-        equity: null,
-        companyHandle: "c1",
-        companyName: "C1",
+        pet_id: testPetIds[2],
+        name: "P3",
+        species: "PS3",
+        age: "PA3",
+        description: "PD3",
+        gender: "PG2",
+        color: "PC3",
       },
     ]);
   });
 
-  test("works: by min salary", async function () {
-    let jobs = await Job.findAll({ minSalary: 250 });
-    expect(jobs).toEqual([
+  test("works: search by name", async function () {
+    let pets = await Pet.findAll({ name: "P1" });
+    expect(pets).toEqual([
       {
-        id: testJobIds[2],
-        title: "Job3",
-        salary: 300,
-        equity: "0",
-        companyHandle: "c1",
-        companyName: "C1",
+        pet_id: testPetIds[0],
+        name: "P1",
+        species: "PS1",
+        age: "PA1",
+        description: "PD1",
+        gender: "PG1",
+        color: "PC1",
       },
     ]);
   });
 
-  test("works: by equity", async function () {
-    let jobs = await Job.findAll({ hasEquity: true });
-    expect(jobs).toEqual([
+  test("works: search by age", async function () {
+    let pets = await Job.findAll({ age: "PA2" });
+    expect(pets).toEqual([
       {
-        id: testJobIds[0],
-        title: "Job1",
-        salary: 100,
-        equity: "0.1",
-        companyHandle: "c1",
-        companyName: "C1",
-      },
-      {
-        id: testJobIds[1],
-        title: "Job2",
-        salary: 200,
-        equity: "0.2",
-        companyHandle: "c1",
-        companyName: "C1",
+        pet_id: testPetIds[1],
+        name: "P2",
+        species: "PS2",
+        age: "PA2",
+        description: "PD2",
+        gender: "PG2",
+        color: "PC2",
       },
     ]);
   });
 
-  test("works: by min salary & equity", async function () {
-    let jobs = await Job.findAll({ minSalary: 150, hasEquity: true });
-    expect(jobs).toEqual([
+  test("works: search by color", async function () {
+    let pets = await Job.findAll({ color: "PC1" });
+    expect(pets).toEqual([
       {
-        id: testJobIds[1],
-        title: "Job2",
-        salary: 200,
-        equity: "0.2",
-        companyHandle: "c1",
-        companyName: "C1",
+        pet_id: testPetIds[0],
+        name: "P1",
+        species: "PS1",
+        age: "PA1",
+        description: "PD1",
+        gender: "PG1",
+        color: "PC1",
       },
-    ]);
-  });
-
-  test("works: by name", async function () {
-    let jobs = await Job.findAll({ title: "ob1" });
-    expect(jobs).toEqual([
       {
-        id: testJobIds[0],
-        title: "Job1",
-        salary: 100,
-        equity: "0.1",
-        companyHandle: "c1",
-        companyName: "C1",
+        pet_id: testPetIds[1],
+        name: "P2",
+        species: "PS2",
+        age: "PA2",
+        description: "PD2",
+        gender: "PG2",
+        color: "PC1",
       },
     ]);
   });
@@ -126,84 +113,21 @@ describe("findAll", function () {
 
 describe("get", function () {
   test("works", async function () {
-    let job = await Job.get(testJobIds[0]);
-    expect(job).toEqual({
-      id: testJobIds[0],
-      title: "Job1",
-      salary: 100,
-      equity: "0.1",
-      company: {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      },
+    let pet = await Pet.get(testPetIds[0]);
+    expect(pet).toEqual({
+      pet_id: testPetIds[0],
+      name: "P1",
+      species: "PS1",
+      age: "PA1",
+      description: "PD1",
+      gender: "PG1",
+      color: "PC1",
     });
   });
 
-  test("not found if no such job", async function () {
+  test("not found if no such pet", async function () {
     try {
-      await Job.get(0);
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-});
-
-/************************************** update */
-
-describe("update", function () {
-  let updateData = {
-    title: "New",
-    salary: 500,
-    equity: "0.5",
-  };
-  test("works", async function () {
-    let job = await Job.update(testJobIds[0], updateData);
-    expect(job).toEqual({
-      id: testJobIds[0],
-      companyHandle: "c1",
-      ...updateData,
-    });
-  });
-
-  test("not found if no such job", async function () {
-    try {
-      await Job.update(0, {
-        title: "test",
-      });
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-
-  test("bad request with no data", async function () {
-    try {
-      await Job.update(testJobIds[0], {});
-      fail();
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
-  });
-});
-
-/************************************** remove */
-
-describe("remove", function () {
-  test("works", async function () {
-    await Job.remove(testJobIds[0]);
-    const res = await db.query("SELECT id FROM jobs WHERE id=$1", [
-      testJobIds[0],
-    ]);
-    expect(res.rows.length).toEqual(0);
-  });
-
-  test("not found if no such job", async function () {
-    try {
-      await Job.remove(0);
+      await Pet.get(0);
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
