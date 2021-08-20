@@ -60,7 +60,6 @@ router.get("/:pet_id", async function (req, res, next) {
 
 router.get("/organization/:id", async function (req, res, next) {
   try {
-    console.warn(req.params);
     const idStr = +req.params.id;
     const idNum = parseInt(idStr);
     const org = await Pet.getOrganization(idNum);
