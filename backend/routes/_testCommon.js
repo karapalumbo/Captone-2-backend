@@ -5,57 +5,50 @@ const User = require("../models/user");
 const Pet = require("../models/pet");
 const { createToken } = require("../helpers/tokens");
 
+const { BCRYPT_WORK_FACTOR } = require("../config");
+
 const testPetIds = [];
 
 async function commonBeforeAll() {
-  // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");
-  // noinspection SqlWithoutWhere
-  await db.query("DELETE FROM companies");
+  await db.query("DELETE FROM pets");
 
-  await Company.create({
-    handle: "c1",
-    name: "C1",
-    numEmployees: 1,
-    description: "Desc1",
-    logoUrl: "http://c1.img",
-  });
-  await Company.create({
-    handle: "c2",
-    name: "C2",
-    numEmployees: 2,
-    description: "Desc2",
-    logoUrl: "http://c2.img",
-  });
-  await Company.create({
-    handle: "c3",
-    name: "C3",
-    numEmployees: 3,
-    description: "Desc3",
-    logoUrl: "http://c3.img",
-  });
-
-  testJobIds[0] = (
-    await Job.create({
-      title: "J1",
-      salary: 1,
-      equity: "0.1",
-      companyHandle: "c1",
+  testPetIds[0] = (
+    await Pet.get({
+      pet_id: 55,
+      name: "P1",
+      species: "S1",
+      age: "A1",
+      gender: "G1",
+      description: "D1",
+      photo: "http://c1.img",
+      id: 1,
     })
   ).id;
-  testJobIds[1] = (
-    await Job.create({
-      title: "J2",
-      salary: 2,
-      equity: "0.2",
-      companyHandle: "c1",
+
+  testPetIds[1] = (
+    await Pet.get({
+      pet_id: 56,
+      name: "P2",
+      species: "P2",
+      age: "A2",
+      gender: "G2",
+      description: "D2",
+      photo: "http://c2.img",
+      id: 2,
     })
   ).id;
-  testJobIds[2] = (
-    await Job.create({
-      title: "J3",
-      salary: 3,
-      /* equity null */ companyHandle: "c1",
+
+  testPetIds[2] = (
+    await Pet.get({
+      pet_id: 57,
+      name: "C3",
+      species: "S3",
+      age: "A3",
+      gender: "G3",
+      description: "D3",
+      photo: "http://c3.img",
+      id: 3,
     })
   ).id;
 
@@ -65,7 +58,6 @@ async function commonBeforeAll() {
     lastName: "U1L",
     email: "user1@user.com",
     password: "password1",
-    isAdmin: false,
   });
   await User.register({
     username: "u2",
@@ -73,7 +65,6 @@ async function commonBeforeAll() {
     lastName: "U2L",
     email: "user2@user.com",
     password: "password2",
-    isAdmin: false,
   });
   await User.register({
     username: "u3",
@@ -81,10 +72,9 @@ async function commonBeforeAll() {
     lastName: "U3L",
     email: "user3@user.com",
     password: "password3",
-    isAdmin: false,
   });
 
-  await User.applyToJob("u1", testJobIds[0]);
+  await User.favoritePet("u1", testPetIds[1]);
 }
 
 async function commonBeforeEach() {
@@ -99,17 +89,15 @@ async function commonAfterAll() {
   await db.end();
 }
 
-const u1Token = createToken({ username: "u1", isAdmin: false });
-const u2Token = createToken({ username: "u2", isAdmin: false });
-const adminToken = createToken({ username: "admin", isAdmin: true });
+const u1Token = createToken({ username: "u1" });
+const u2Token = createToken({ username: "u2" });
 
 module.exports = {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
+  testPetIds,
   u1Token,
   u2Token,
-  adminToken,
 };

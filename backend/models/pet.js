@@ -89,6 +89,7 @@ class Pet {
   static async getOrganization(organization_id) {
     const orgRes = await db.query(
       `SELECT id,
+            org_id, 
             name,
             address,
             email,
@@ -100,7 +101,7 @@ class Pet {
 
     const org = orgRes.rows[0];
 
-    if (!org) throw new NotFoundError(`No organization: ${org_id}`);
+    if (!org) throw new NotFoundError(`No organization: ${organization_id}`);
 
     return org;
   }

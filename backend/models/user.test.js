@@ -12,7 +12,7 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
+  testUserIds,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -27,6 +27,8 @@ describe("authenticate", function () {
     const user = await User.authenticate("u1", "password1");
     expect(user).toEqual({
       username: "u1",
+      first_name: "U1F",
+      last_name: "U1L",
       email: "u1@email.com",
     });
   });
@@ -55,6 +57,8 @@ describe("authenticate", function () {
 describe("register", function () {
   const newUser = {
     username: "new",
+    firstName: "Test",
+    lastName: "Tester",
     email: "test@test.com",
   };
 
@@ -66,20 +70,6 @@ describe("register", function () {
     expect(user).toEqual(newUser);
     const found = await db.query("SELECT * FROM users WHERE username = 'new'");
     expect(found.rows.length).toEqual(1);
-    expect(found.rows[0].is_admin).toEqual(false);
-    expect(found.rows[0].password.startsWith("$2b$")).toEqual(true);
-  });
-
-  test("works: adds admin", async function () {
-    let user = await User.register({
-      ...newUser,
-      password: "password",
-      isAdmin: true,
-    });
-    expect(user).toEqual({ ...newUser, isAdmin: true });
-    const found = await db.query("SELECT * FROM users WHERE username = 'new'");
-    expect(found.rows.length).toEqual(1);
-    expect(found.rows[0].is_admin).toEqual(true);
     expect(found.rows[0].password.startsWith("$2b$")).toEqual(true);
   });
 
@@ -111,14 +101,12 @@ describe("findAll", function () {
         firstName: "U1F",
         lastName: "U1L",
         email: "u1@email.com",
-        isAdmin: false,
       },
       {
         username: "u2",
         firstName: "U2F",
         lastName: "U2L",
         email: "u2@email.com",
-        isAdmin: false,
       },
     ]);
   });
@@ -134,8 +122,7 @@ describe("get", function () {
       firstName: "U1F",
       lastName: "U1L",
       email: "u1@email.com",
-      isAdmin: false,
-      applications: [testJobIds[0]],
+      favorites: [11],
     });
   });
 
@@ -156,27 +143,25 @@ describe("update", function () {
     firstName: "NewF",
     lastName: "NewF",
     email: "new@email.com",
-    isAdmin: true,
   };
 
   test("works", async function () {
-    let job = await User.update("u1", updateData);
-    expect(job).toEqual({
+    let user = await User.update("u1", updateData);
+    expect(user).toEqual({
       username: "u1",
       ...updateData,
     });
   });
 
   test("works: set password", async function () {
-    let job = await User.update("u1", {
+    let user = await User.update("u1", {
       password: "new",
     });
-    expect(job).toEqual({
+    expect(user).toEqual({
       username: "u1",
       firstName: "U1F",
       lastName: "U1L",
       email: "u1@email.com",
-      isAdmin: false,
     });
     const found = await db.query("SELECT * FROM users WHERE username = 'u1'");
     expect(found.rows.length).toEqual(1);
@@ -205,57 +190,20 @@ describe("update", function () {
   });
 });
 
-/************************************** remove */
+/************************************** favoritePet */
 
-describe("remove", function () {
+describe("favoritePet", function () {
   test("works", async function () {
-    await User.remove("u1");
-    const res = await db.query("SELECT * FROM users WHERE username='u1'");
-    expect(res.rows.length).toEqual(0);
-  });
+    await User.favoritePet("u1", 11);
 
-  test("not found if no such user", async function () {
-    try {
-      await User.remove("nope");
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-});
-
-/************************************** applyToJob */
-
-describe("applyToJob", function () {
-  test("works", async function () {
-    await User.applyToJob("u1", testJobIds[1]);
-
-    const res = await db.query("SELECT * FROM applications WHERE job_id=$1", [
-      testJobIds[1],
+    const res = await db.query("SELECT * FROM favorites WHERE username=$1", [
+      11,
     ]);
     expect(res.rows).toEqual([
       {
-        job_id: testJobIds[1],
+        pet_id: 11,
         username: "u1",
       },
     ]);
-  });
-
-  test("not found if no such job", async function () {
-    try {
-      await User.applyToJob("u1", 0, "applied");
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-
-  test("not found if no such user", async function () {
-    try {
-      await User.applyToJob("nope", testJobIds[0], "applied");
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
   });
 });
