@@ -11,46 +11,54 @@ const testPetIds = [];
 
 async function commonBeforeAll() {
   await db.query("DELETE FROM users");
-  await db.query("DELETE FROM pets");
+  // await db.query("DELETE FROM pets");
 
-  testPetIds[0] = (
-    await Pet.get({
-      pet_id: 55,
-      name: "P1",
-      species: "S1",
-      age: "A1",
-      gender: "G1",
-      description: "D1",
-      photo: "http://c1.img",
-      id: 1,
-    })
-  ).id;
+  /************************************** POST /auth/token */
 
-  testPetIds[1] = (
-    await Pet.get({
-      pet_id: 56,
-      name: "P2",
-      species: "P2",
-      age: "A2",
-      gender: "G2",
-      description: "D2",
-      photo: "http://c2.img",
-      id: 2,
-    })
-  ).id;
+  describe("POST /auth/token", function () {
+    test("works", async function () {
+      const resp = await request(app).post("/auth/token").send({
+        username: "u1",
+        password: "password1",
+      });
+      expect(resp.body).toEqual({
+        token: expect.any(String),
+      });
+    });
 
-  testPetIds[2] = (
-    await Pet.get({
-      pet_id: 57,
-      name: "C3",
-      species: "S3",
-      age: "A3",
-      gender: "G3",
-      description: "D3",
-      photo: "http://c3.img",
-      id: 3,
-    })
-  ).id;
+    test("unauth with non-existent user", async function () {
+      const resp = await request(app).post("/auth/token").send({
+        username: "no-such-user",
+        password: "password1",
+      });
+      expect(resp.statusCode).toEqual(401);
+    });
+
+    test("unauth with wrong password", async function () {
+      const resp = await request(app).post("/auth/token").send({
+        username: "u1",
+        password: "nope",
+      });
+      expect(resp.statusCode).toEqual(401);
+    });
+
+    test("bad request with missing data", async function () {
+      const resp = await request(app).post("/auth/token").send({
+        username: "u1",
+      });
+      expect(resp.statusCode).toEqual(400);
+    });
+
+    test("bad request with invalid data", async function () {
+      const resp = await request(app).post("/auth/token").send({
+        username: 42,
+        password: "above-is-a-number",
+      });
+      expect(resp.statusCode).toEqual(400);
+    });
+  });
+
+  /************************************** POST /auth/register */
 
   await User.register({
     username: "u1",
@@ -74,7 +82,7 @@ async function commonBeforeAll() {
     password: "password3",
   });
 
-  await User.favoritePet("u1", testPetIds[1]);
+  // await User.favoritePet("u1", 11);
 }
 
 async function commonBeforeEach() {

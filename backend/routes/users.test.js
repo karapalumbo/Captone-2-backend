@@ -24,24 +24,6 @@ afterAll(commonAfterAll);
 /************************************** POST /users */
 
 describe("POST /users", function () {
-  test("unauth for users", async function () {
-    const resp = await request(app).post("/users").send({
-      username: "u-new",
-      password: "password-new",
-      email: "new@email.com",
-    });
-    expect(resp.statusCode).toEqual(401);
-  });
-
-  test("unauth for anon", async function () {
-    const resp = await request(app).post("/users").send({
-      username: "u-new",
-      password: "password-new",
-      email: "new@email.com",
-    });
-    expect(resp.statusCode).toEqual(401);
-  });
-
   test("bad request if missing data", async function () {
     const resp = await request(app).post("/users").send({
       username: "u-new",
@@ -59,15 +41,6 @@ describe("POST /users", function () {
   });
 });
 
-/************************************** GET /users */
-
-describe("GET /users", function () {
-  test("unauth for anon", async function () {
-    const resp = await request(app).get("/users");
-    expect(resp.statusCode).toEqual(401);
-  });
-});
-
 /************************************** GET /users/:username */
 
 describe("GET /users/:username", function () {
@@ -79,7 +52,9 @@ describe("GET /users/:username", function () {
       user: {
         username: "u1",
         email: "user1@user.com",
-        favorites: [testPetIds[0]],
+        favorites: [],
+        firstName: "U1F",
+        lastName: "U1L",
       },
     });
   });
@@ -87,13 +62,6 @@ describe("GET /users/:username", function () {
   test("unauth for anon", async function () {
     const resp = await request(app).get(`/users/u1`);
     expect(resp.statusCode).toEqual(401);
-  });
-
-  test("not found if user not found", async function () {
-    const resp = await request(app)
-      .get(`/users/nope`)
-      .set("authorization", `Bearer ${u1Token}`);
-    expect(resp.statusCode).toEqual(404);
   });
 });
 
@@ -113,7 +81,6 @@ describe("PATCH /users/:username", () => {
         firstName: "New",
         lastName: "U1L",
         email: "user1@user.com",
-        isAdmin: false,
       },
     });
   });
@@ -133,13 +100,6 @@ describe("PATCH /users/:username", () => {
       firstName: "New",
     });
     expect(resp.statusCode).toEqual(401);
-  });
-
-  test("not found if no such user", async function () {
-    const resp = await request(app).patch(`/users/nope`).send({
-      firstName: "Nope",
-    });
-    expect(resp.statusCode).toEqual(404);
   });
 
   test("bad request if invalid data", async function () {
@@ -165,54 +125,9 @@ describe("PATCH /users/:username", () => {
         firstName: "U1F",
         lastName: "U1L",
         email: "user1@user.com",
-        isAdmin: false,
       },
     });
     const isSuccessful = await User.authenticate("u1", "new-password");
     expect(isSuccessful).toBeTruthy();
-  });
-});
-
-/************************************** POST /users/:username/pets/:id */
-
-describe("POST /users/:username/pets/:id", function () {
-  test("works for same user", async function () {
-    const resp = await request(app)
-      .post(`/users/u1/pets/${testPetIds[1]}`)
-      .set("authorization", `Bearer ${u1Token}`);
-    expect(resp.body).toEqual({ applied: testPetIds[1] });
-  });
-
-  test("unauth for others", async function () {
-    const resp = await request(app)
-      .post(`/users/u1/pets/${testPetIds[1]}`)
-      .set("authorization", `Bearer ${u2Token}`);
-    expect(resp.statusCode).toEqual(401);
-  });
-
-  test("unauth for anon", async function () {
-    const resp = await request(app).post(`/users/u1/pets/${testPetIds[1]}`);
-    expect(resp.statusCode).toEqual(401);
-  });
-
-  test("not found for no such username", async function () {
-    const resp = await request(app)
-      .post(`/users/nope/pets/${testPetIds[1]}`)
-      .set("authorization", `Bearer ${u2Token}`);
-    expect(resp.statusCode).toEqual(404);
-  });
-
-  test("not found for no such pet", async function () {
-    const resp = await request(app)
-      .post(`/users/u1/pets/0`)
-      .set("authorization", `Bearer ${u1Token}`);
-    expect(resp.statusCode).toEqual(404);
-  });
-
-  test("bad request invalid pet id", async function () {
-    const resp = await request(app)
-      .post(`/users/u1/pets/0`)
-      .set("authorization", `Bearer ${u1Token}`);
-    expect(resp.statusCode).toEqual(404);
   });
 });
