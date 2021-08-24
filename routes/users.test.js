@@ -11,7 +11,6 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testPetIds,
   u1Token,
   u2Token,
 } = require("./_testCommon");
