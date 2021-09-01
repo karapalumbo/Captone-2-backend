@@ -78,9 +78,8 @@ router.get("/:username", ensureCorrectUser, async function (req, res, next) {
  * Data can include:
  *   { firstName, lastName, password, email }
  *
- * Returns { username, firstName, lastName, email, isAdmin }
+ * Returns { username, firstName, lastName, email }
  *
- * Authorization required: admin or same-user-as-:username
  **/
 
 router.patch("/:username", ensureCorrectUser, async function (req, res, next) {
